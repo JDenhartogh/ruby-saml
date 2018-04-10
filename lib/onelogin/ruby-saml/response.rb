@@ -752,8 +752,10 @@ module OneLogin
           puts in_response_to
           puts (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift)
           puts now
+          puts (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now)
           puts attrs['Recipient']
           puts settings.assertion_consumer_service_url
+          puts (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
                   (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
                   (attrs.include? "NotBefore" and  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
