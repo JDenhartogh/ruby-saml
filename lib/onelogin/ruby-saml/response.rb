@@ -732,10 +732,8 @@ module OneLogin
       # @raise [ValidationError] if soft == false and validation fails
       #
       def validate_subject_confirmation
-        puts "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         return true if options[:skip_subject_confirmation]
         valid_subject_confirmation = false
-        puts options.inspect
         subject_confirmation_nodes = xpath_from_signed_assertion('/a:Subject/a:SubjectConfirmation')
         now = Time.now.utc
         subject_confirmation_nodes.each do |subject_confirmation|
@@ -750,13 +748,9 @@ module OneLogin
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
-          puts attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)
-          puts attrs.include? "NotBefore"
-          puts partse_time(confirmation_data_node, "NotBefore") if attrs.include? "NotBefore"
-          puts (now + allowed_clock_drift)          
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
                   (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
-                  (attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
+                  (!(attrs.include? "NotBefore") ||  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
                   (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
 
           valid_subject_confirmation = true
