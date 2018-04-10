@@ -743,17 +743,19 @@ module OneLogin
           if subject_confirmation.attributes.include? "Method" and subject_confirmation.attributes['Method'] != 'urn:oasis:names:tc:SAML:2.0:cm:bearer'
             next
           end
-          puts "A"
           confirmation_data_node = REXML::XPath.first(
             subject_confirmation,
             'a:SubjectConfirmationData',
             { "a" => ASSERTION }
           )
-          puts "B"
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
           puts "C"
+          puts attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to
+          puts attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now
+          puts attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)
+          puts attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url 
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
                   (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
                   (attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
