@@ -748,9 +748,15 @@ module OneLogin
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
+          puts attrs['InResponseTo']
+          puts in_response_to
+          puts (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift)
+          puts now
+          puts attrs['Recipient']
+          puts settings.assertion_consumer_service_url
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
                   (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
-                  (!(attrs.include? "NotBefore") ||  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
+                  (attrs.include? "NotBefore" and  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
                   (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
 
           valid_subject_confirmation = true
