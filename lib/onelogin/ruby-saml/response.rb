@@ -181,7 +181,7 @@ module OneLogin
             end
           end
           puts "ATTRIBUTES"
-          puts attributes
+          puts attributes.inspect
           attributes
         end
       end
