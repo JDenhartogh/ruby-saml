@@ -180,6 +180,8 @@ module OneLogin
               attributes.add(name, values.flatten)
             end
           end
+          puts "ATTRIBUTES"
+          puts attributes
           attributes
         end
       end
