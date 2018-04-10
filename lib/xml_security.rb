@@ -223,6 +223,9 @@ module XMLSecurity
         fingerprint = fingerprint_alg.hexdigest(cert.to_der)
 
         # check cert matches registered idp cert
+        puts "FINGERPRINTS"
+        puts fingerprint
+        puts idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
         if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
           @errors << "Fingerprint mismatch"
           return append_error("Fingerprint mismatch", soft)
