@@ -732,26 +732,28 @@ module OneLogin
       # @raise [ValidationError] if soft == false and validation fails
       #
       def validate_subject_confirmation
+        puts "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         return true if options[:skip_subject_confirmation]
         valid_subject_confirmation = false
-
+        puts options.inspect
         subject_confirmation_nodes = xpath_from_signed_assertion('/a:Subject/a:SubjectConfirmation')
-
+        puts "LETS CHECK THIS FUNTION OUT"
         now = Time.now.utc
         subject_confirmation_nodes.each do |subject_confirmation|
           if subject_confirmation.attributes.include? "Method" and subject_confirmation.attributes['Method'] != 'urn:oasis:names:tc:SAML:2.0:cm:bearer'
             next
           end
-
+          puts "A"
           confirmation_data_node = REXML::XPath.first(
             subject_confirmation,
             'a:SubjectConfirmationData',
             { "a" => ASSERTION }
           )
-
+          puts "B"
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
+          puts "C"
           next if (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to) ||
                   (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
                   (attrs.include? "NotBefore" and parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
