@@ -798,7 +798,6 @@ module OneLogin
       #
       def validate_signature
         error_msg = "Invalid Signature on SAML Response"
-        puts "A"
         # If the response contains the signature, and the assertion was encrypted, validate the original SAML Response
         # otherwise, review if the decrypted assertion contains a signature
         sig_elements = REXML::XPath.match(
@@ -807,13 +806,10 @@ module OneLogin
           { "p" => PROTOCOL, "ds" => DSIG },
           { 'id' => document.signed_element_id }
         )
-        puts "B"
         use_original = sig_elements.size == 1 || decrypted_document.nil?
         doc = use_original ? document : decrypted_document
-        puts "C"
         # Check signature nodes
         if sig_elements.nil? || sig_elements.size == 0
-          puts "D"
           sig_elements = REXML::XPath.match(
             doc,
             "/p:Response/a:Assertion[@ID=$id]/ds:Signature",
@@ -823,18 +819,18 @@ module OneLogin
         end
        
         if sig_elements.size != 1
-          puts "E"
           return append_error(error_msg)
         end
-        puts "F"
         idp_certs = settings.get_idp_cert_multi
         if idp_certs.nil? || idp_certs[:signing].empty?
           puts "G"
           opts = {}
           opts[:fingerprint_alg] = settings.idp_cert_fingerprint_algorithm
+          puts opts[:fingerprint_alg]
           opts[:cert] = settings.get_idp_cert
+          puts opts[:cert]
           fingerprint = settings.get_fingerprint
-
+          puts fingerprint
           unless fingerprint && doc.validate_document(fingerprint, @soft, opts)
             puts "H"
             return append_error(error_msg)
