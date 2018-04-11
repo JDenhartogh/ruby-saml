@@ -180,8 +180,6 @@ module OneLogin
               attributes.add(name, values.flatten)
             end
           end
-          puts "ATTRIBUTES"
-          puts attributes.inspect
           attributes
         end
       end
@@ -750,12 +748,6 @@ module OneLogin
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
-          puts attrs['InResponseTo']
-          puts in_response_to
-          puts (attrs.include? "InResponseTo" and attrs['InResponseTo'] != in_response_to)
-          puts (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now)
-          puts (attrs.include? "NotBefore" and  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift))
-          puts (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
 
           next if (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
                   (attrs.include? "NotBefore" and  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
@@ -825,34 +817,25 @@ module OneLogin
         end
         idp_certs = settings.get_idp_cert_multi
         if idp_certs.nil? || idp_certs[:signing].empty?
-          puts "G"
           opts = {}
           opts[:fingerprint_alg] = settings.idp_cert_fingerprint_algorithm
-          puts opts[:fingerprint_alg]
           opts[:cert] = settings.get_idp_cert
-          puts opts[:cert]
           fingerprint = settings.get_fingerprint
-          puts fingerprint
           unless fingerprint && doc.validate_document(fingerprint, @soft, opts)
-            puts "H"
             return append_error(error_msg)
           end
         else
-          puts "I"
           valid = false
           idp_certs[:signing].each do |idp_cert|
             valid = doc.validate_document_with_cert(idp_cert)
             if valid
-              puts "J"
               break
             end
           end
           unless valid
-            puts "K"
             return append_error(error_msg)
           end
         end
-        puts "L"
         true
       end
 
