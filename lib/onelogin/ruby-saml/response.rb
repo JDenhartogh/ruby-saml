@@ -311,6 +311,10 @@ module OneLogin
             { "p" => PROTOCOL }
           )
           puts "ABC #{node}"
+          puts "ABC #{1-------------------------------------------------------------------------}"
+          puts "ABC #{node.attributes['InResponseTo']}"
+          puts "ABC #{2-------------------------------------------------------------------------}"
+          puts "ABC #{node.attributes.inspect}"
           node.nil? ? nil : node.attributes['InResponseTo']
         end
       end
