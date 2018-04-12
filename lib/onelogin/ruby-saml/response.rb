@@ -303,12 +303,15 @@ module OneLogin
       # @return [String|nil] The InResponseTo attribute from the SAML Response.
       #
       def in_response_to
+        puts "A"
         @in_response_to ||= begin
           node = REXML::XPath.first(
             document,
             "/p:Response",
             { "p" => PROTOCOL }
           )
+          puts document.response
+          puts node
           node.nil? ? nil : node.attributes['InResponseTo']
         end
       end
@@ -748,7 +751,7 @@ module OneLogin
           next unless confirmation_data_node
 
           attrs = confirmation_data_node.attributes
-
+	  puts in_response_to
           next if (attrs.include? "NotOnOrAfter" and (parse_time(confirmation_data_node, "NotOnOrAfter") + allowed_clock_drift) <= now) ||
                   (attrs.include? "NotBefore" and  parse_time(confirmation_data_node, "NotBefore") > (now + allowed_clock_drift)) ||
                   (attrs.include? "Recipient" and !options[:skip_recipient_check] and settings and attrs['Recipient'] != settings.assertion_consumer_service_url)
